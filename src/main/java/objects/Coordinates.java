@@ -1,8 +1,7 @@
 package objects;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.DecimalMin;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,12 +15,10 @@ public class Coordinates {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotNull(message = "Поле x не должно быть пустым")
-    @Min(-596)
+    @DecimalMin(value = "-596", inclusive = false)
     @Column(name = "x")
     private long x; //Значение поля должно быть больше -596
 
-    @NotNull(message = "Поле y не должно быть пустым")
     @Column(name = "y")
     private int y;
 

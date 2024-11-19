@@ -15,7 +15,6 @@ public class Location {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotNull(message = "Поле x не должно быть пустым")
     @Column(name = "x")
     private int x;
 
@@ -23,7 +22,6 @@ public class Location {
     @Column(name = "y")
     private Integer y; //Поле не может быть null
 
-    @NotNull(message = "Поле z не должно быть пустым")
     @Column(name = "z")
     private int z;
 

@@ -1,8 +1,7 @@
 package objects;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,8 +15,7 @@ public class DragonCave {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotNull(message = "Поле number_of_treasures не должно быть пустым")
-    @Min(0)
+    @Positive
     @Column(name = "number_of_treasures")
     private float numberOfTreasures; //Значение поля должно быть больше 0
 

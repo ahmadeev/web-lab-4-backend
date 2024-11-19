@@ -1,8 +1,8 @@
 package objects;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -40,8 +40,7 @@ public class Dragon {
     @JoinColumn(name = "person_id", referencedColumnName = "id")
     private Person killer; //Поле может быть null
 
-    @NotNull(message = "Поле age не должно быть пустым")
-    @Min(0)
+    @Positive
     @Column(name = "age")
     private long age; //Значение поля должно быть больше 0
 
@@ -49,7 +48,7 @@ public class Dragon {
     private String description; //Поле может быть null
 
     @NotNull(message = "Поле wingspan не должно быть пустым")
-    @Min(0)
+    @Positive
     @Column(name = "wingspan")
     private Long wingspan; //Значение поля должно быть больше 0, Поле не может быть null
 
@@ -59,7 +58,6 @@ public class Dragon {
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "dragon_head_id", referencedColumnName = "id")
-    @NotNull(message = "Поле класса DragonHead не должно быть пустым")
     private DragonHead head;
 
     public Dragon(String name, Coordinates coordinates, ZonedDateTime creationDate, DragonCave cave, Person killer, long age, String description, Long wingspan, DragonCharacter character, DragonHead head) {
@@ -73,5 +71,10 @@ public class Dragon {
         this.wingspan = wingspan;
         this.character = character;
         this.head = head;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        creationDate = ZonedDateTime.now(); // Установка текущей даты при создании
     }
 }

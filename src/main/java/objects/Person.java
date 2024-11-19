@@ -1,8 +1,9 @@
 package objects;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,6 +21,7 @@ public class Person {
     private long id;
 
     @NotNull(message = "Поле name не должно быть пустым")
+    @NotEmpty
     @Column(name = "name")
     private String name; //Поле не может быть null, Строка не может быть пустой
 
@@ -41,7 +43,7 @@ public class Person {
     @Column(name = "birthday")
     private java.time.LocalDate birthday; //Поле не может быть null
 
-    @Min(0)
+    @Positive
     @Column(name = "height")
     private Integer height; //Поле может быть null, Значение поля должно быть больше 0
 
