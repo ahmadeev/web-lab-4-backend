@@ -1,0 +1,66 @@
+{
+  "name": "Drogon",
+  "coordinates": {
+    "x": 100,
+    "y": 200
+  },
+  "creationDate": "2024-11-19T10:00:00+00:00",
+  "cave": {
+    "numberOfTreasures": 5
+  },
+  "killer": {
+    "name": "Killer Name",
+    "eyeColor": "WHITE",
+    "hairColor": "BLACK",
+    "location": {
+      "x": 1,
+      "y": 2,
+      "z": 3
+    },
+    "birthday": "1990-06-15",
+    "height": 180
+  },
+  "age": 25,
+  "description": "A fierce dragon",
+  "wingspan": 15,
+  "character": "CHAOTIC_EVIL",
+  "head": {
+    "eyesCount": 2,
+    "toothCount": 10
+  }
+}
+
+
+    @POST
+    @Path("/dragon-fixed")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createFixedDragon() {
+        System.out.println("Trying to create dragon");
+        Dragon dragon = new Dragon(
+                "dragon",
+                new Coordinates((long) 600, (int) 700),
+                java.time.ZonedDateTime.now(),
+                new DragonCave((float) 5),
+                new Person(
+                        "killer",
+                        Color.WHITE,
+                        Color.BLACK,
+                        new Location(
+                                1, 2, 3
+                        ),
+                        LocalDate.now(),
+                        (Integer) 192
+                ),
+                (long) 52,
+                null,
+                (long) 75,
+                DragonCharacter.CHAOTIC_EVIL,
+                new DragonHead(
+                        (float) 2, (Double) 32.5
+                )
+        );
+
+        mainService.createDragon(dragon);
+        System.out.println("Successfully created dragon");
+        return Response.ok().build();
+    }

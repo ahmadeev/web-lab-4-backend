@@ -1,5 +1,6 @@
 package controllers;
 
+import dto.DragonDTO;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
@@ -17,13 +18,13 @@ import java.time.LocalDate;
 @Path("/user")
 public class MainController {
 
+    @Inject
+    private MainService mainService;
+
     @PostConstruct
     private void init() {
         System.out.println("MainController initialized");
     }
-
-    @Inject
-    private MainService mainService;
 
     @GET
     @Path("/dragon/{id}")
@@ -35,34 +36,14 @@ public class MainController {
 
     @POST
     @Path("/dragon")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createDragon() {
+    public Response createDragon(DragonDTO dragonDTO) {
         System.out.println("Trying to create dragon");
-        Dragon dragon = new Dragon(
-                "dragon",
-                new Coordinates((long) 600, (int) 700),
-                java.time.ZonedDateTime.now(),
-                new DragonCave((float) 5),
-                new Person(
-                        "killer",
-                        Color.WHITE,
-                        Color.BLACK,
-                        new Location(
-                                1, 2, 3
-                        ),
-                        LocalDate.now(),
-                        (Integer) 192
-                ),
-                (long) 52,
-                null,
-                (long) 75,
-                DragonCharacter.CHAOTIC_EVIL,
-                new DragonHead(
-                        (float) 2, (Double) 32.5
-                )
-        );
 
+        Dragon dragon = mainService.createEntityFromDTO(dragonDTO);
         mainService.createDragon(dragon);
+
         System.out.println("Successfully created dragon");
         return Response.ok().build();
     }
