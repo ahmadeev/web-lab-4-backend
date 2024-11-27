@@ -1,5 +1,7 @@
 package objects;
 
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -54,5 +56,14 @@ public class Person {
         this.location = location;
         this.birthday = birthday;
         this.height = height;
+    }
+
+    public String toJson() {
+        try (Jsonb jsonb = JsonbBuilder.create()) {
+            return jsonb.toJson(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "{}";
+        }
     }
 }

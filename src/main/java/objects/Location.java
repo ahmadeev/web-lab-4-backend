@@ -1,5 +1,7 @@
 package objects;
 
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -29,5 +31,14 @@ public class Location {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    public String toJson() {
+        try (Jsonb jsonb = JsonbBuilder.create()) {
+            return jsonb.toJson(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "{}";
+        }
     }
 }

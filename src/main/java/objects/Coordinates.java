@@ -1,5 +1,7 @@
 package objects;
 
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import lombok.Getter;
@@ -25,5 +27,14 @@ public class Coordinates {
     public Coordinates(long x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    public String toJson() {
+        try (Jsonb jsonb = JsonbBuilder.create()) {
+            return jsonb.toJson(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "{}";
+        }
     }
 }

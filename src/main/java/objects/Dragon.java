@@ -1,5 +1,7 @@
 package objects;
 
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -76,5 +78,14 @@ public class Dragon {
     @PrePersist
     protected void onCreate() {
         creationDate = ZonedDateTime.now(); // Установка текущей даты при создании
+    }
+
+    public String toJson() {
+        try (Jsonb jsonb = JsonbBuilder.create()) {
+            return jsonb.toJson(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "{}";
+        }
     }
 }

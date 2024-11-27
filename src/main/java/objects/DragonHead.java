@@ -1,5 +1,7 @@
 package objects;
 
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -25,5 +27,14 @@ public class DragonHead {
     public DragonHead(float eyesCount, Double toothCount) {
         this.eyesCount = eyesCount;
         this.toothCount = toothCount;
+    }
+
+    public String toJson() {
+        try (Jsonb jsonb = JsonbBuilder.create()) {
+            return jsonb.toJson(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "{}";
+        }
     }
 }

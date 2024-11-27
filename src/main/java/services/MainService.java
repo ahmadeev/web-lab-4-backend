@@ -9,6 +9,8 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import objects.*;
 
+import java.util.List;
+
 @Named(value = "mainService")
 @ApplicationScoped
 public class MainService {
@@ -29,6 +31,14 @@ public class MainService {
     @Transactional
     public Dragon getDragonById(long id) {
         return em.find(Dragon.class, id);
+    }
+
+    @Transactional
+    public List<Dragon> getDragons(int page, int size) {
+        return em.createQuery("SELECT i FROM Dragon i", Dragon.class)
+                .setFirstResult(page * size)
+                .setMaxResults(size)
+                .getResultList();
     }
 
     @Transactional
