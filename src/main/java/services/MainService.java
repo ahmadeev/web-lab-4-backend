@@ -8,6 +8,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import objects.*;
+import jakarta.persistence.Query;
 
 import java.util.List;
 
@@ -24,7 +25,8 @@ public class MainService {
     }
 
     @Transactional
-    public void createDragon(Dragon dragon) {
+    public void createDragon(Dragon dragon, long userId) {
+        dragon.setOwnerId(userId);
         em.persist(dragon);
     }
 
@@ -42,13 +44,22 @@ public class MainService {
     }
 
     @Transactional
-    public boolean deleteDragonById(long id) {
+    public boolean deleteDragonById(long id, long userId) {
         Dragon dragon = em.find(Dragon.class, id);
-        if (dragon != null) {
-            em.remove(dragon);
-            return true;
-        }
-        return false; // Если дракон с таким id не найден
+
+        if (dragon == null) return false;
+        if (dragon.getOwnerId() != userId) return false;
+
+        em.remove(dragon);
+        return true;
+    }
+
+    @Transactional
+    public int deleteDragons(long userId) {
+        String jpql = "DELETE FROM Dragon o WHERE o.ownerId = :userId";
+        Query query = em.createQuery(jpql);
+        query.setParameter("userId", userId);
+        return query.executeUpdate();
     }
 
     public Dragon createEntityFromDTO(DragonDTO dto) {

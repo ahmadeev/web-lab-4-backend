@@ -62,6 +62,23 @@ public class Dragon {
     @JoinColumn(name = "dragon_head_id", referencedColumnName = "id")
     private DragonHead head;
 
+    @Column(name = "owner_id")
+    private long ownerId;
+
+    public Dragon(String name, Coordinates coordinates, ZonedDateTime creationDate, DragonCave cave, Person killer, long age, String description, Long wingspan, DragonCharacter character, DragonHead head, long ownerId) {
+        this.name = name;
+        this.coordinates = coordinates;
+        this.creationDate = creationDate;
+        this.cave = cave;
+        this.killer = killer;
+        this.age = age;
+        this.description = description;
+        this.wingspan = wingspan;
+        this.character = character;
+        this.head = head;
+        this.ownerId = ownerId;
+    }
+
     public Dragon(String name, Coordinates coordinates, ZonedDateTime creationDate, DragonCave cave, Person killer, long age, String description, Long wingspan, DragonCharacter character, DragonHead head) {
         this.name = name;
         this.coordinates = coordinates;

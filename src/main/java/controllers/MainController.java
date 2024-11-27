@@ -9,10 +9,11 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import objects.*;
+import responses.DragonResponseEntity;
+import responses.ResponseStatus;
 import services.MainService;
 import jakarta.inject.Inject;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Named(value = "mainController")
@@ -34,19 +35,25 @@ public class MainController {
     public Response getDragon(@PathParam("id") long id) {
         System.out.println("Trying to get dragon №" + id);
         Dragon dragon = mainService.getDragonById(id);
-        if (dragon != null) return Response.ok().entity("{\"status\":\"success\",\"details\":\"\", \"data\":" + dragon.toJson() + "}").build();
-        return Response.status(Response.Status.NOT_FOUND).entity("{\"status\":\"error\",\"details\":\"Entity not found.\",\"data\":{}}").build();
+        if (dragon != null) return Response.ok().entity(
+                new DragonResponseEntity(ResponseStatus.SUCCESS, "", dragon)
+        ).build();
+        return Response.status(Response.Status.NOT_FOUND).entity(
+                new DragonResponseEntity(ResponseStatus.ERROR, "Dragon not found", null)
+        ).build();
     }
 
     // @QueryParam в случае '/dragons?page=1&size=10, @PathParam для штук типа '/dragon/{id}'
     @GET
     @Path("/dragons")
     @Transactional
-    public Response getItems(@QueryParam("page") @DefaultValue("0") int page,
+    public Response getDragons(@QueryParam("page") @DefaultValue("0") int page,
                              @QueryParam("size") @DefaultValue("10") int size) {
         List<Dragon> dragons = mainService.getDragons(page, size);
 
-        return Response.ok().entity("{\"status\":\"success\",\"details\":\"\", \"data\":" + dragons + "}").build();
+        return Response.ok().entity(
+                new DragonResponseEntity(ResponseStatus.SUCCESS, "", dragons)
+        ).build();
     }
 
     @POST
@@ -56,23 +63,57 @@ public class MainController {
     public Response createDragon(DragonDTO dragonDTO) {
         System.out.println("Trying to create dragon");
 
+        // ЗАГЛУШКА
+        long userId = 1;
+
         Dragon dragon = mainService.createEntityFromDTO(dragonDTO);
-        mainService.createDragon(dragon);
+        mainService.createDragon(dragon, userId);
 
         System.out.println("Successfully created dragon");
-        return Response.ok().entity("{\"status\":\"success\",\"details\":\"Successfully created dragon.\",\"data\":{}}").build();
+        return Response.ok().entity(
+                new DragonResponseEntity(ResponseStatus.SUCCESS,"Successfully created dragon", null)
+        ).build();
     }
 
     @DELETE
     @Path("/dragon/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteDragon(@PathParam("id") long id) {
-        System.out.println("Trying to delete dragon №" + id);
-        boolean isDeleted = mainService.deleteDragonById(id);
+        System.out.println("Trying to delete dragon #" + id);
+
+        // ЗАГЛУШКА
+        long userId = 1;
+
+        boolean isDeleted = mainService.deleteDragonById(id, userId);
         if (isDeleted) {
-            return Response.noContent().entity("{\"status\":\"success\",\"details\":\"\"}").build(); // Статус 204, если удаление успешно
+            return Response.noContent().entity(
+                    new DragonResponseEntity(ResponseStatus.SUCCESS, "Successfully deleted dragon", null)
+            ).build(); // Статус 204, если удаление успешно
         } else {
-            return Response.status(Response.Status.NOT_FOUND).entity("{\"status\":\"error\",\"details\":\"Entity not found.\",\"data\":{}}").build(); // Статус 404, если дракон не найден
+            return Response.status(Response.Status.NOT_FOUND).entity(
+                    new DragonResponseEntity(ResponseStatus.ERROR, "Dragon not found", null)
+            ).build(); // Статус 404, если дракон не найден
+        }
+    }
+
+    @DELETE
+    @Path("/dragons")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteDragons() {
+        // ЗАГЛУШКА
+        long userId = 1;
+
+        int rowsDeleted = mainService.deleteDragons(userId);;
+
+        if (rowsDeleted > 0) {
+            //  можно использовать noContent(), но тогда не будет тела ответа
+            return Response.ok().entity(
+                    new DragonResponseEntity(ResponseStatus.SUCCESS, "Successfully deleted %d dragons".formatted(rowsDeleted), null)
+            ).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).entity(
+                    new DragonResponseEntity(ResponseStatus.ERROR, "Dragons belong to user not found", null)
+            ).build();
         }
     }
 }

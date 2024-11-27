@@ -13,10 +13,10 @@
             <property name="hibernate.connection.username" value="s367839"/>
             <property name="hibernate.connection.password" value="6t7nOCeWvCLDBTZ2"/>
             <property name="hibernate.jpa.compliance.query" value="false"/>
-            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.show_sql" value="false"/>
             <property name="hibernate.format_sql" value="true"/>
-            <property name="hibernate.hbm2ddl.auto" value="update"/>
-            <property name="jakarta.persistence.schema-generation.database.action" value="drop-and-create"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/> <!-- update -->
+            <property name="jakarta.persistence.schema-generation.database.action" value="drop-and-create"/> <!-- drop-and-create -->
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
         </properties>
     </persistence-unit>
