@@ -1,6 +1,5 @@
 package auth;
 
-import dto.DragonDTO;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -9,10 +8,8 @@ import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import objects.Dragon;
 import responses.DragonResponseEntity;
 import responses.ResponseStatus;
-import services.MainService;
 
 @Named(value = "authController")
 @ApplicationScoped
