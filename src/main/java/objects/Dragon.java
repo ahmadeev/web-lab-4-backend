@@ -65,10 +65,9 @@ public class Dragon {
     @Column(name = "owner_id")
     private long ownerId;
 
-    public Dragon(String name, Coordinates coordinates, ZonedDateTime creationDate, DragonCave cave, Person killer, long age, String description, Long wingspan, DragonCharacter character, DragonHead head, long ownerId) {
+    public Dragon(String name, Coordinates coordinates, DragonCave cave, Person killer, long age, String description, Long wingspan, DragonCharacter character, DragonHead head, long ownerId) {
         this.name = name;
         this.coordinates = coordinates;
-        this.creationDate = creationDate;
         this.cave = cave;
         this.killer = killer;
         this.age = age;
@@ -79,10 +78,9 @@ public class Dragon {
         this.ownerId = ownerId;
     }
 
-    public Dragon(String name, Coordinates coordinates, ZonedDateTime creationDate, DragonCave cave, Person killer, long age, String description, Long wingspan, DragonCharacter character, DragonHead head) {
+    public Dragon(String name, Coordinates coordinates, DragonCave cave, Person killer, long age, String description, Long wingspan, DragonCharacter character, DragonHead head) {
         this.name = name;
         this.coordinates = coordinates;
-        this.creationDate = creationDate;
         this.cave = cave;
         this.killer = killer;
         this.age = age;

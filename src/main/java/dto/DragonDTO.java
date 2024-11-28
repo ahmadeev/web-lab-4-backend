@@ -16,8 +16,6 @@ public class DragonDTO {
     @NotNull
     private CoordinatesDTO coordinates; //Поле не может быть null
     @NotNull
-    private java.time.ZonedDateTime creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
-    @NotNull
     private DragonCaveDTO cave; //Поле не может быть null
     private PersonDTO killer; //Поле может быть null
     @Positive

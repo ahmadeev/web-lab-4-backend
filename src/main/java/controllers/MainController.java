@@ -4,7 +4,7 @@ import dto.DragonDTO;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
-import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -31,6 +31,7 @@ public class MainController {
 
     @GET
     @Path("/dragon/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDragon(@PathParam("id") long id) {
         System.out.println("Trying to get dragon №" + id);
@@ -46,7 +47,8 @@ public class MainController {
     // @QueryParam в случае '/dragons?page=1&size=10, @PathParam для штук типа '/dragon/{id}'
     @GET
     @Path("/dragons")
-    @Transactional
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getDragons(@QueryParam("page") @DefaultValue("0") int page,
                              @QueryParam("size") @DefaultValue("10") int size) {
         List<Dragon> dragons = mainService.getDragons(page, size);
@@ -60,7 +62,7 @@ public class MainController {
     @Path("/dragon")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createDragon(DragonDTO dragonDTO) {
+    public Response createDragon(@Valid DragonDTO dragonDTO) {
         System.out.println("Trying to create dragon");
 
         // ЗАГЛУШКА
@@ -75,8 +77,31 @@ public class MainController {
         ).build();
     }
 
+    // подумать. пока было трудно
+    @PUT
+    @Path("/dragon/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateDragon(@PathParam("id") long id, @Valid DragonDTO dragonDTO) {
+        // ЗАГЛУШКА
+        long userId = 1;
+
+        boolean isUpdated = mainService.updateDragonById(id, userId, dragonDTO);
+
+        if (isUpdated) {
+            return Response.ok().entity(
+                    new DragonResponseEntity(ResponseStatus.SUCCESS,"Successfully updated dragon", null)
+            ).build();
+        }
+
+        return Response.status(Response.Status.NOT_MODIFIED).entity(
+                new DragonResponseEntity(ResponseStatus.ERROR,"Dragon was not updated", null)
+        ).build();
+    }
+
     @DELETE
     @Path("/dragon/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteDragon(@PathParam("id") long id) {
         System.out.println("Trying to delete dragon #" + id);
@@ -98,6 +123,7 @@ public class MainController {
 
     @DELETE
     @Path("/dragons")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteDragons() {
         // ЗАГЛУШКА

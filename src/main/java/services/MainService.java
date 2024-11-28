@@ -43,6 +43,23 @@ public class MainService {
                 .getResultList();
     }
 
+    //  пока не готово
+    @Transactional
+    public boolean updateDragonById(long id, long userId, DragonDTO dragonDTO) {
+        Dragon dragon = em.find(Dragon.class, id);
+
+        if (dragon == null) return false;
+        if (dragon.getOwnerId() != userId) return false;
+
+        // Обновление полей
+        dragon.setName(dragonDTO.getName());
+        dragon.setAge(dragonDTO.getAge());
+        dragon.setWingspan(dragonDTO.getWingspan());
+        dragon.setDescription(dragonDTO.getDescription());
+
+        return true;
+    }
+
     @Transactional
     public boolean deleteDragonById(long id, long userId) {
         Dragon dragon = em.find(Dragon.class, id);
@@ -65,17 +82,23 @@ public class MainService {
     public Dragon createEntityFromDTO(DragonDTO dto) {
         var coordinates = dto.getCoordinates();
         var cave = dto.getCave();
-        var killer = dto.getKiller();
-        var location = killer.getLocation();
         var head = dto.getHead();
 
+        if (coordinates == null || cave == null) return null;
+
+        var killer = dto.getKiller();
+
+        if (killer == null) return null;
+
+        var location = killer.getLocation();
+
         return new Dragon(
+                // без id, creationTime и ownerId
                 dto.getName(),
                 new Coordinates(
                         coordinates.getX(),
                         coordinates.getY()
                 ),
-                dto.getCreationDate(),
                 new DragonCave(
                         cave.getNumberOfTreasures()
                 ),
