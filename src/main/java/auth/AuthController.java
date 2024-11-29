@@ -1,5 +1,7 @@
 package auth;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -8,13 +10,18 @@ import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import responses.DragonResponseEntity;
+import org.mindrot.jbcrypt.BCrypt;
 import responses.ResponseStatus;
+
+import java.util.Date;
+
 
 @Named(value = "authController")
 @ApplicationScoped
 @Path("/auth")
 public class AuthController {
+
+    private final static String SECRET_KEY = "secret_key";
 
     @Inject
     private AuthService authService;
@@ -34,15 +41,26 @@ public class AuthController {
         User userInput = authService.createEntityFromDTO(userDTO);
         User userStored = authService.getUserByName(userInput.getName());
 
-        if (userInput.getPassword().equals(userStored.getPassword())) {
+        if (userStored == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(
+                    new AuthResponseEntity(ResponseStatus.ERROR,"User does not exist", null)
+            ).build();
+        }
+
+        if (BCrypt.checkpw(userInput.getPassword(), userStored.getPassword())) {
+            String token = JWT.create()
+                    .withSubject(userInput.getName())
+                    .withExpiresAt(new Date(System.currentTimeMillis() + 3600000)) // 1 час
+                    .sign(Algorithm.HMAC256(SECRET_KEY));
+
             System.out.println("User successfully signed in");
-            return Response.ok().entity(
-                    new DragonResponseEntity(ResponseStatus.SUCCESS,"User successfully signed in", null)
+            return Response.ok(
+                    new AuthResponseEntity(ResponseStatus.SUCCESS,"User successfully signed in", new TokenResponse(token))
             ).build();
         }
 
         return Response.status(Response.Status.BAD_REQUEST).entity(
-                new DragonResponseEntity(ResponseStatus.ERROR,"Error during sign in attempt", null)
+                new AuthResponseEntity(ResponseStatus.ERROR,"Error during sign in attempt", null)
         ).build();
     }
 
@@ -59,14 +77,14 @@ public class AuthController {
         if (userStored != null) {
             System.out.println("User already exists");
             return Response.status(Response.Status.BAD_REQUEST).entity(
-                    new DragonResponseEntity(ResponseStatus.ERROR,"Error during sign up attempt", null)
+                    new AuthResponseEntity(ResponseStatus.ERROR,"Error during sign up attempt", null)
             ).build();
         }
 
         authService.createUser(userInput);
         System.out.println("User successfully signed up");
         return Response.ok().entity(
-                new DragonResponseEntity(ResponseStatus.SUCCESS,"User successfully signed up", null)
+                new AuthResponseEntity(ResponseStatus.SUCCESS,"User successfully signed up", null)
         ).build();
     }
 }

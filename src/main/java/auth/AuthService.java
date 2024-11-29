@@ -7,12 +7,15 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.List;
 
 @Named(value = "authService")
 @ApplicationScoped
 public class AuthService {
+    private static final String SALT = "salt";
+
     @PersistenceContext
     protected EntityManager em;
 
@@ -23,6 +26,7 @@ public class AuthService {
 
     @Transactional
     public void createUser(User user) {
+        user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
         em.persist(user);
     }
 
