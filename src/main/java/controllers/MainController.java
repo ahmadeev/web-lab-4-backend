@@ -34,7 +34,7 @@ public class MainController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDragon(@PathParam("id") long id) {
-        System.out.println("Trying to get dragon №" + id);
+        System.out.println("Trying to get dragon #" + id);
         Dragon dragon = mainService.getDragonById(id);
         if (dragon != null) return Response.ok().entity(
                 new DragonResponseEntity(ResponseStatus.SUCCESS, "", dragon)
