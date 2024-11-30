@@ -10,22 +10,26 @@ import jakarta.ws.rs.ext.Provider;
 
 import java.io.IOException;
 
-@Provider  // Аннотация, чтобы зарегистрировать фильтр как ресурс
-@Priority(2)  // Фильтр с наибольшим приоритетом
+@Provider  // аннотация, чтобы зарегистрировать фильтр как ресурс
+@Priority(2)  // фильтр с наибольшим приоритетом
 public class AuthFilter implements ContainerRequestFilter {
 
     private final static String SECRET_KEY = "secret_key";
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
+        // не учитывается начало эндпоинта api (одинаков для всего приложения)
         String path = requestContext.getUriInfo().getPath();
+        System.out.println(path);
 
-        if (path.startsWith("api/user") || path.startsWith("api/admin")) {
-            // Извлекаем токен из заголовка Authorization
+        if (path.startsWith("/user") || path.startsWith("/admin")) {
+            // извлекаем токен из заголовка Authorization
+            System.out.println("Verifying token");
             String authHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 
-            // Проверяем, есть ли токен в заголовке и начинается ли он с "Bearer"
+            // проверяем, есть ли токен в заголовке и начинается ли он с "Bearer"
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                System.out.println("Request denied");
                 requestContext.abortWith(
                         Response.status(Response.Status.UNAUTHORIZED)
                                 .entity("Authorization token is missing or malformed")
@@ -34,28 +38,34 @@ public class AuthFilter implements ContainerRequestFilter {
                 return;
             }
 
-            // Извлекаем сам токен (без "Bearer " префикса)
+            // извлекаем сам токен (без "Bearer " префикса)
             String token = authHeader.substring(7);
 
             try {
-                // Проверяем и декодируем токен
+                // декодируем и проверяем токен
                 DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC256(SECRET_KEY))
                         .build()
                         .verify(token);
 
-                // Если токен валидный, извлекаем информацию, например, имя пользователя
+                System.out.println("Valid token");
+
+                // если токен валидный, извлекаем информацию, например, имя пользователя
                 String username = decodedJWT.getSubject();
-                // Мы можем установить информацию о пользователе в контекст запроса
+                // мы можем установить информацию о пользователе в контекст запроса
                 requestContext.setProperty("username", username);
 
             } catch (Exception e) {
-                // В случае ошибки токен невалиден или истёк
+                System.out.println(e.getMessage());
+                System.out.println("Invalid token");
+
                 requestContext.abortWith(
                         Response.status(Response.Status.UNAUTHORIZED)
                                 .entity("Invalid or expired token")
                                 .build()
                 );
             }
+        } else {
+            System.out.println("Token does not have to be verified");
         }
     }
 }

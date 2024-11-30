@@ -1,5 +1,6 @@
 package dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -21,6 +22,7 @@ public class PersonDTO {
     @NotNull
     private LocationDTO location; //Поле не может быть null
     @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private java.time.LocalDate birthday; //Поле не может быть null
     @Positive
     private Integer height; //Поле может быть null, Значение поля должно быть больше 0
