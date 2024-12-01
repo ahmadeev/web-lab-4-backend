@@ -50,7 +50,7 @@ public class AuthController {
         if (BCrypt.checkpw(userInput.getPassword(), userStored.getPassword())) {
             String token = JWT.create()
                     .withSubject(userInput.getName())
-                    .withExpiresAt(new Date(System.currentTimeMillis() + 3600000)) // 1 час
+                    .withExpiresAt(new Date(System.currentTimeMillis() + 60000)) // 1 час = 3_600_000
                     .sign(Algorithm.HMAC256(SECRET_KEY));
 
             System.out.println("User successfully signed in");
@@ -77,7 +77,7 @@ public class AuthController {
         if (userStored != null) {
             System.out.println("User already exists");
             return Response.status(Response.Status.BAD_REQUEST).entity(
-                    new AuthResponseEntity(ResponseStatus.ERROR,"Error during sign up attempt", null)
+                    new AuthResponseEntity(ResponseStatus.ERROR,"User already exists", null)
             ).build();
         }
 

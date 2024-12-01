@@ -7,6 +7,7 @@ import jakarta.annotation.Priority;
 import jakarta.ws.rs.container.*;
 import jakarta.ws.rs.core.*;
 import jakarta.ws.rs.ext.Provider;
+import responses.ResponseStatus;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -83,7 +84,7 @@ public class AuthFilter implements ContainerRequestFilter {
 
                 requestContext.abortWith(
                         Response.status(Response.Status.UNAUTHORIZED)
-                                .entity("Invalid or expired token")
+                                .entity(new AuthResponseEntity(ResponseStatus.ERROR, "Invalid or expired token", null))
                                 .build()
                 );
             }
