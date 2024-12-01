@@ -9,6 +9,7 @@ import jakarta.ws.rs.core.*;
 import jakarta.ws.rs.ext.Provider;
 
 import java.io.IOException;
+import java.security.Principal;
 
 @Provider  // аннотация, чтобы зарегистрировать фильтр как ресурс
 @Priority(2)  // фильтр с наибольшим приоритетом
@@ -51,8 +52,30 @@ public class AuthFilter implements ContainerRequestFilter {
 
                 // если токен валидный, извлекаем информацию, например, имя пользователя
                 String username = decodedJWT.getSubject();
-                // мы можем установить информацию о пользователе в контекст запроса
-                requestContext.setProperty("username", username);
+
+                // Устанавливаем кастомный SecurityContext
+                requestContext.setSecurityContext(new SecurityContext() {
+                    @Override
+                    public Principal getUserPrincipal() {
+                        return () -> username; // Principal возвращает имя пользователя
+                    }
+
+                    @Override
+                    public boolean isUserInRole(String role) {
+                        // Если нужны роли, извлеките их из токена и реализуйте проверку
+                        return false;
+                    }
+
+                    @Override
+                    public boolean isSecure() {
+                        return requestContext.getUriInfo().getAbsolutePath().toString().startsWith("https");
+                    }
+
+                    @Override
+                    public String getAuthenticationScheme() {
+                        return "Bearer";
+                    }
+                });
 
             } catch (Exception e) {
                 System.out.println(e.getMessage());

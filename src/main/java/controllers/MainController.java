@@ -1,13 +1,17 @@
 package controllers;
 
+import auth.AuthService;
 import dto.DragonDTO;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.SecurityContext;
 import objects.*;
 import responses.DragonResponseEntity;
 import responses.ResponseStatus;
@@ -23,6 +27,9 @@ public class MainController {
 
     @Inject
     private MainService mainService;
+
+    @Inject
+    private AuthService authService;
 
     @PostConstruct
     private void init() {
@@ -62,11 +69,14 @@ public class MainController {
     @Path("/dragon")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createDragon(@Valid DragonDTO dragonDTO) {
+    public Response createDragon(@Valid DragonDTO dragonDTO, @Context SecurityContext securityContext) {
         System.out.println("Trying to create dragon");
 
-        // ЗАГЛУШКА
-        long userId = 1;
+        String username = securityContext.getUserPrincipal().getName();
+        System.out.println(username);
+
+        long userId = authService.getUserByName(username).getId();
+        System.out.println(userId);
 
         Dragon dragon = mainService.createEntityFromDTO(dragonDTO);
         mainService.createDragon(dragon, userId);
@@ -82,9 +92,12 @@ public class MainController {
     @Path("/dragon/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateDragon(@PathParam("id") long id, @Valid DragonDTO dragonDTO) {
-        // ЗАГЛУШКА
-        long userId = 1;
+    public Response updateDragon(@PathParam("id") long id, @Valid DragonDTO dragonDTO, @Context SecurityContext securityContext) {
+        String username = securityContext.getUserPrincipal().getName();
+        System.out.println(username);
+
+        long userId = authService.getUserByName(username).getId();
+        System.out.println(userId);
 
         boolean isUpdated = mainService.updateDragonById(id, userId, dragonDTO);
 
@@ -103,11 +116,14 @@ public class MainController {
     @Path("/dragon/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteDragon(@PathParam("id") long id) {
+    public Response deleteDragon(@PathParam("id") long id, @Context SecurityContext securityContext) {
         System.out.println("Trying to delete dragon #" + id);
 
-        // ЗАГЛУШКА
-        long userId = 1;
+        String username = securityContext.getUserPrincipal().getName();
+        System.out.println(username);
+
+        long userId = authService.getUserByName(username).getId();
+        System.out.println(userId);
 
         boolean isDeleted = mainService.deleteDragonById(id, userId);
         if (isDeleted) {
@@ -125,9 +141,12 @@ public class MainController {
     @Path("/dragons")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteDragons() {
-        // ЗАГЛУШКА
-        long userId = 1;
+    public Response deleteDragons(@Context SecurityContext securityContext) {
+        String username = securityContext.getUserPrincipal().getName();
+        System.out.println(username);
+
+        long userId = authService.getUserByName(username).getId();
+        System.out.println(userId);
 
         int rowsDeleted = mainService.deleteDragons(userId);;
 
