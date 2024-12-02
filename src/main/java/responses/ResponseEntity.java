@@ -7,12 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class ResponseEntity {
+public class ResponseEntity {
     private ResponseStatus status;
     private String details;
     private Object data;
