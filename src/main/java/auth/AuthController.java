@@ -57,11 +57,11 @@ public class AuthController {
             return Response.ok(
                     new AuthResponseEntity(ResponseStatus.SUCCESS,"User successfully signed in", new TokenResponse(token))
             ).build();
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST).entity(
+                    new AuthResponseEntity(ResponseStatus.ERROR,"Password is incorrect", null)
+            ).build();
         }
-
-        return Response.status(Response.Status.BAD_REQUEST).entity(
-                new AuthResponseEntity(ResponseStatus.ERROR,"Error during sign in attempt", null)
-        ).build();
     }
 
     @POST
