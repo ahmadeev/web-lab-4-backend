@@ -25,9 +25,28 @@ public class AuthService {
     }
 
     @Transactional
-    public void createUser(User user) {
+    public String createUser(User user) {
+        // если нет роли админа, то создаем пользователя
+        if (!user.getRole().equals(Roles.ADMIN)) {
+            user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
+            em.persist(user);
+            return "User successfully signed up";
+        }
+
+        // если роль админа есть и админы в системе существуют, создаем заявку
+        if (this.getAdminsList() != null && !this.getAdminsList().isEmpty()) {
+            em.persist(new AdminRequest(
+                    user.getName(),
+                    BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()),
+                    user.getRole()
+            ));
+            return "Successfully requested admin rights";
+        }
+
+        // если роль админа есть и админов в системе нет, создаем админа
         user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
         em.persist(user);
+        return "Admin successfully signed up";
     }
 
     @Transactional
@@ -45,10 +64,21 @@ public class AuthService {
         return users.get(0);
     }
 
+    @Transactional
+    public List<User> getAdminsList() {
+        String jpql = "SELECT o FROM User o WHERE o.role = :role";
+        Query query = em.createQuery(jpql, User.class);
+        query.setParameter("role", Roles.ADMIN);
+        List<User> admins = query.getResultList();
+        if (admins.isEmpty()) return null;
+        return admins;
+    }
+
     public User createEntityFromDTO(UserDTO userDTO) {
         return new User(
             userDTO.getName(),
-            userDTO.getPassword()
+            userDTO.getPassword(),
+            userDTO.getIsAdmin().equals("true") ? Roles.ADMIN : Roles.USER
         );
     }
 }

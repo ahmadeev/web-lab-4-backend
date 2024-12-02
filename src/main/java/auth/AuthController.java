@@ -81,10 +81,10 @@ public class AuthController {
             ).build();
         }
 
-        authService.createUser(userInput);
+        String msg = authService.createUser(userInput);
         System.out.println("User successfully signed up");
         return Response.ok().entity(
-                new AuthResponseEntity(ResponseStatus.SUCCESS,"User successfully signed up", null)
+                new AuthResponseEntity(ResponseStatus.SUCCESS, msg, null)
         ).build();
     }
 }

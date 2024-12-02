@@ -15,4 +15,6 @@ public class UserDTO {
     @NotNull(message = "Поле password не должно быть пустым")
     @NotEmpty
     private String password;
+
+    private String isAdmin = "false";
 }

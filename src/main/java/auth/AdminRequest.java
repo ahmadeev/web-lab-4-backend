@@ -7,11 +7,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "app_users")
+@Table(name = "app_admin_requests")
 @Getter
 @Setter
 @NoArgsConstructor
-public class User {
+public class AdminRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -24,13 +24,14 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @Enumerated(EnumType.STRING)
+    @NotNull(message = "Поле role не должно быть пустым")
     @Column(name = "role")
     private Roles role;
 
-    public User(String name, String password, Roles role) {
+    public AdminRequest(String name, String password, Roles role) {
         this.name = name;
         this.password = password;
         this.role = role;
     }
 }
+
