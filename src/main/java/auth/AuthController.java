@@ -11,15 +11,13 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.mindrot.jbcrypt.BCrypt;
+import responses.ResponseEntity;
 import responses.ResponseStatus;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-
-import static java.util.stream.Collectors.toList;
-
 
 @Named(value = "authController")
 @ApplicationScoped
@@ -48,7 +46,7 @@ public class AuthController {
 
         if (userStored == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity(
-                    new AuthResponseEntity(ResponseStatus.ERROR,"User does not exist", null)
+                    new ResponseEntity(ResponseStatus.ERROR,"User does not exist", null)
             ).build();
         }
 
@@ -62,11 +60,11 @@ public class AuthController {
             System.out.println("User successfully signed in");
             List<Roles> roles = new LinkedList<>(Arrays.asList(userStored.getRole()));
             return Response.ok(
-                    new AuthResponseEntity(ResponseStatus.SUCCESS,"User successfully signed in", new SignInResponse(token, roles))
+                    new ResponseEntity(ResponseStatus.SUCCESS,"User successfully signed in", new SignInResponse(token, roles))
             ).build();
         } else {
             return Response.status(Response.Status.BAD_REQUEST).entity(
-                    new AuthResponseEntity(ResponseStatus.ERROR,"Password is incorrect", null)
+                    new ResponseEntity(ResponseStatus.ERROR,"Password is incorrect", null)
             ).build();
         }
     }
@@ -84,14 +82,14 @@ public class AuthController {
         if (userStored != null) {
             System.out.println("User already exists");
             return Response.status(Response.Status.BAD_REQUEST).entity(
-                    new AuthResponseEntity(ResponseStatus.ERROR,"User already exists", null)
+                    new ResponseEntity(ResponseStatus.ERROR,"User already exists", null)
             ).build();
         }
 
         String msg = authService.createUser(userInput);
         System.out.println("User successfully signed up");
         return Response.ok().entity(
-                new AuthResponseEntity(ResponseStatus.SUCCESS, msg, null)
+                new ResponseEntity(ResponseStatus.SUCCESS, msg, null)
         ).build();
     }
 }

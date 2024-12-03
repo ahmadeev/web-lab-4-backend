@@ -7,33 +7,32 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import objects.*;
-import responses.DragonResponseEntity;
+import responses.ResponseEntity;
 import responses.ResponseStatus;
-import services.MainService;
 import jakarta.inject.Inject;
+import services.DragonService;
 
 import java.util.List;
 
 @Named(value = "mainController")
 @ApplicationScoped
 @Path("/user")
-public class MainController {
+public class DragonController {
 
     @Inject
-    private MainService mainService;
+    private DragonService dragonService;
 
     @Inject
     private AuthService authService;
 
     @PostConstruct
     private void init() {
-        System.out.println("MainController initialized");
+        System.out.println("DragonController initialized");
     }
 
     @GET
@@ -42,12 +41,12 @@ public class MainController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDragon(@PathParam("id") long id) {
         System.out.println("Trying to get dragon #" + id);
-        Dragon dragon = mainService.getDragonById(id);
+        Dragon dragon = dragonService.getDragonById(id);
         if (dragon != null) return Response.ok().entity(
-                new DragonResponseEntity(ResponseStatus.SUCCESS, "", dragon)
+                new ResponseEntity(ResponseStatus.SUCCESS, "", dragon)
         ).build();
         return Response.status(Response.Status.NOT_FOUND).entity(
-                new DragonResponseEntity(ResponseStatus.ERROR, "Dragon not found", null)
+                new ResponseEntity(ResponseStatus.ERROR, "Dragon not found", null)
         ).build();
     }
 
@@ -58,10 +57,10 @@ public class MainController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDragons(@QueryParam("page") @DefaultValue("0") int page,
                              @QueryParam("size") @DefaultValue("10") int size) {
-        List<Dragon> dragons = mainService.getDragons(page, size);
+        List<Dragon> dragons = dragonService.getDragons(page, size);
 
         return Response.ok().entity(
-                new DragonResponseEntity(ResponseStatus.SUCCESS, "", dragons)
+                new ResponseEntity(ResponseStatus.SUCCESS, "", dragons)
         ).build();
     }
 
@@ -78,12 +77,12 @@ public class MainController {
         long userId = authService.getUserByName(username).getId();
         System.out.println(userId);
 
-        Dragon dragon = mainService.createEntityFromDTO(dragonDTO);
-        mainService.createDragon(dragon, userId);
+        Dragon dragon = dragonService.createEntityFromDTO(dragonDTO);
+        dragonService.createDragon(dragon, userId);
 
         System.out.println("Successfully created dragon");
         return Response.ok().entity(
-                new DragonResponseEntity(ResponseStatus.SUCCESS,"Successfully created dragon", null)
+                new ResponseEntity(ResponseStatus.SUCCESS,"Successfully created dragon", null)
         ).build();
     }
 
@@ -99,16 +98,16 @@ public class MainController {
         long userId = authService.getUserByName(username).getId();
         System.out.println(userId);
 
-        boolean isUpdated = mainService.updateDragonById(id, userId, dragonDTO);
+        boolean isUpdated = dragonService.updateDragonById(id, userId, dragonDTO);
 
         if (isUpdated) {
             return Response.ok().entity(
-                    new DragonResponseEntity(ResponseStatus.SUCCESS,"Successfully updated dragon", null)
+                    new ResponseEntity(ResponseStatus.SUCCESS,"Successfully updated dragon", null)
             ).build();
         }
 
         return Response.status(Response.Status.NOT_MODIFIED).entity(
-                new DragonResponseEntity(ResponseStatus.ERROR,"Dragon was not updated", null)
+                new ResponseEntity(ResponseStatus.ERROR,"Dragon was not updated", null)
         ).build();
     }
 
@@ -125,14 +124,14 @@ public class MainController {
         long userId = authService.getUserByName(username).getId();
         System.out.println(userId);
 
-        boolean isDeleted = mainService.deleteDragonById(id, userId);
+        boolean isDeleted = dragonService.deleteDragonById(id, userId);
         if (isDeleted) {
             return Response.noContent().entity(
-                    new DragonResponseEntity(ResponseStatus.SUCCESS, "Successfully deleted dragon", null)
+                    new ResponseEntity(ResponseStatus.SUCCESS, "Successfully deleted dragon", null)
             ).build(); // Статус 204, если удаление успешно
         } else {
             return Response.status(Response.Status.NOT_FOUND).entity(
-                    new DragonResponseEntity(ResponseStatus.ERROR, "Dragon not found", null)
+                    new ResponseEntity(ResponseStatus.ERROR, "Dragon not found", null)
             ).build(); // Статус 404, если дракон не найден
         }
     }
@@ -148,16 +147,16 @@ public class MainController {
         long userId = authService.getUserByName(username).getId();
         System.out.println(userId);
 
-        int rowsDeleted = mainService.deleteDragons(userId);;
+        int rowsDeleted = dragonService.deleteDragons(userId);;
 
         if (rowsDeleted > 0) {
             //  можно использовать noContent(), но тогда не будет тела ответа
             return Response.ok().entity(
-                    new DragonResponseEntity(ResponseStatus.SUCCESS, "Successfully deleted %d dragons".formatted(rowsDeleted), null)
+                    new ResponseEntity(ResponseStatus.SUCCESS, "Successfully deleted %d dragons".formatted(rowsDeleted), null)
             ).build();
         } else {
             return Response.status(Response.Status.NOT_FOUND).entity(
-                    new DragonResponseEntity(ResponseStatus.ERROR, "Dragons belong to user not found", null)
+                    new ResponseEntity(ResponseStatus.ERROR, "Dragons belong to user not found", null)
             ).build();
         }
     }

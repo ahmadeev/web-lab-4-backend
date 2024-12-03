@@ -14,14 +14,14 @@ import java.util.List;
 
 @Named(value = "mainService")
 @ApplicationScoped
-public class MainService {
+public class DragonService {
 
     @PersistenceContext
     protected EntityManager em;
 
     @PostConstruct
     private void init() {
-        System.out.println("MainService initialized");
+        System.out.println("DragonService initialized");
     }
 
     @Transactional

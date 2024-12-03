@@ -2,7 +2,6 @@ package auth;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.container.*;
@@ -96,7 +95,7 @@ public class AuthFilter implements ContainerRequestFilter {
 
                 requestContext.abortWith(
                         Response.status(Response.Status.UNAUTHORIZED)
-                                .entity(new AuthResponseEntity(ResponseStatus.ERROR, "Invalid or expired token", null))
+                                .entity(new ResponseEntity(ResponseStatus.ERROR, "Invalid or expired token", null))
                                 .build()
                 );
             }
