@@ -13,7 +13,12 @@ import jakarta.ws.rs.core.Response;
 import org.mindrot.jbcrypt.BCrypt;
 import responses.ResponseStatus;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 
 @Named(value = "authController")
@@ -49,13 +54,15 @@ public class AuthController {
 
         if (BCrypt.checkpw(userInput.getPassword(), userStored.getPassword())) {
             String token = JWT.create()
-                    .withSubject(userInput.getName())
+                    .withSubject(userStored.getName())
+                    .withClaim("roles", userStored.getRole().toString())
                     .withExpiresAt(new Date(System.currentTimeMillis() + 60000)) // 1 час = 3_600_000
                     .sign(Algorithm.HMAC256(SECRET_KEY));
 
             System.out.println("User successfully signed in");
+            List<Roles> roles = new LinkedList<>(Arrays.asList(userStored.getRole()));
             return Response.ok(
-                    new AuthResponseEntity(ResponseStatus.SUCCESS,"User successfully signed in", new TokenResponse(token))
+                    new AuthResponseEntity(ResponseStatus.SUCCESS,"User successfully signed in", new SignInResponse(token, roles))
             ).build();
         } else {
             return Response.status(Response.Status.BAD_REQUEST).entity(

@@ -2,11 +2,13 @@ package auth;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.container.*;
 import jakarta.ws.rs.core.*;
 import jakarta.ws.rs.ext.Provider;
+import responses.ResponseEntity;
 import responses.ResponseStatus;
 
 import java.io.IOException;
@@ -34,7 +36,7 @@ public class AuthFilter implements ContainerRequestFilter {
                 System.out.println("Request denied");
                 requestContext.abortWith(
                         Response.status(Response.Status.UNAUTHORIZED)
-                                .entity("Authorization token is missing or malformed")
+                                .entity(new ResponseEntity(ResponseStatus.ERROR, "Authorization token is missing or malformed", null))
                                 .build()
                 );
                 return;
@@ -54,6 +56,9 @@ public class AuthFilter implements ContainerRequestFilter {
                 // если токен валидный, извлекаем информацию, например, имя пользователя
                 String username = decodedJWT.getSubject();
 
+                // извлечение ролей
+                String roles = decodedJWT.getClaim("roles").asString();
+
                 // Устанавливаем кастомный SecurityContext
                 requestContext.setSecurityContext(new SecurityContext() {
                     @Override
@@ -63,8 +68,7 @@ public class AuthFilter implements ContainerRequestFilter {
 
                     @Override
                     public boolean isUserInRole(String role) {
-                        // Если нужны роли, извлеките их из токена и реализуйте проверку
-                        return false;
+                        return roles != null && roles.contains(role);
                     }
 
                     @Override
@@ -78,6 +82,14 @@ public class AuthFilter implements ContainerRequestFilter {
                     }
                 });
 
+                if (path.startsWith("/admin") && !requestContext.getSecurityContext().isUserInRole(Roles.ADMIN.toString())) {
+                    System.out.println("Request denied. User does not have admin privilege");
+                    requestContext.abortWith(
+                            Response.status(Response.Status.UNAUTHORIZED)
+                                    .entity(new ResponseEntity(ResponseStatus.ERROR, "User does not have admin privilege", null))
+                                    .build()
+                    );
+                }
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 System.out.println("Invalid token");
