@@ -13,6 +13,7 @@ import objects.*;
 import jakarta.persistence.Query;
 import utils.AreaCheck;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Named(value = "shotService")
@@ -31,12 +32,14 @@ public class ShotService {
     }
 
     @Transactional
-    public void createUserShot(Shot shot, long userId) {
-        long startTime = System.nanoTime();
-        shot.setHit(areaCheck.isHit(shot.getX(), shot.getY(), shot.getR()));
-        shot.setOwnerId(userId);
-        shot.setScriptTime((System.nanoTime() - startTime) / 1000);
-        em.persist(shot);
+    public void createUserShot(List<Shot> shots, long userId) {
+        for(Shot shot : shots) {
+            long startTime = System.nanoTime();
+            shot.setHit(areaCheck.isHit(shot.getX(), shot.getY(), shot.getR()));
+            shot.setOwnerId(userId);
+            shot.setScriptTime((System.nanoTime() - startTime) / 1000);
+            em.persist(shot);
+        }
     }
 
     @Transactional
@@ -100,11 +103,13 @@ public class ShotService {
         return query.executeUpdate();
     }
 
-    public Shot createEntityFromDTO(ShotDTO dto) {
-        return new Shot(
-            dto.getX(),
-            dto.getY(),
-            dto.getR()
-        );
+    public List<Shot> createEntityFromDTO(ShotDTO dto) {
+        List<Shot> result = new ArrayList<>();
+        for(double x : dto.getX()) {
+            for(double r : dto.getR()) {
+                result.add(new Shot(x, dto.getY(), r));
+            }
+        }
+        return result;
     }
 }

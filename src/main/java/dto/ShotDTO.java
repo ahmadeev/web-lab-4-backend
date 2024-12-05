@@ -5,14 +5,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ShotDTO {
     @NotNull
-    private double x;
+    private List<Double> x;
     @NotNull
     private double y;
     @NotNull
-    private double r;
+    private List<Double> r;
 }

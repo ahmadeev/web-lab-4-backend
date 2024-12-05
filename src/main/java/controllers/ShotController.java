@@ -48,7 +48,7 @@ public class ShotController {
         long userId = authService.getUserByName(username).getId();
         System.out.println(userId);
 
-        Shot shot = shotService.createEntityFromDTO(shotDTO);
+        List<Shot> shot = shotService.createEntityFromDTO(shotDTO);
         shotService.createUserShot(shot, userId);
 
         System.out.println("Successfully created shot");
