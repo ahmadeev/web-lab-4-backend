@@ -74,11 +74,13 @@ public class ShotController {
 
     // @QueryParam в случае '/shots?page=1&size=10, @PathParam для штук типа '/shot/{id}'
     @GET
-    @Path("/shots")
+    @Path("/shots/all")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getShots(@QueryParam("page") @DefaultValue("0") int page,
-                             @QueryParam("size") @DefaultValue("10") int size) {
+    public Response getShots(
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("size") @DefaultValue("10") int size
+    ) {
         List<Shot> shots = shotService.getShots(page, size);
 
         return Response.ok().entity(
@@ -86,6 +88,7 @@ public class ShotController {
         ).build();
     }
 
+    // было бы круто по всем правилам REST добавить имя пользователя в строку запроса
     @GET
     @Path("/shots")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -181,5 +184,26 @@ public class ShotController {
                     new ResponseEntity(ResponseStatus.ERROR, "Shots belong to user not found", null)
             ).build();
         }
+    }
+
+    @GET
+    @Path("/shots-count")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getShotsCount(@Context SecurityContext securityContext) {
+        System.out.println("Trying to get shots count");
+
+        String username = securityContext.getUserPrincipal().getName();
+        System.out.println(username);
+        long userId = authService.getUserByName(username).getId();
+        System.out.println(userId);
+
+        long count = shotService.getShotsCount(userId);
+        if (count > 0) return Response.ok().entity(
+                new ResponseEntity(ResponseStatus.SUCCESS, "", count)
+        ).build();
+        return Response.status(Response.Status.NOT_FOUND).entity(
+                new ResponseEntity(ResponseStatus.ERROR, "Shots not found", null)
+        ).build();
     }
 }

@@ -103,11 +103,20 @@ public class ShotService {
         return query.executeUpdate();
     }
 
+    @Transactional
+    public long getShotsCount(long userId) {
+        // .executeUpdate() для INSERT, UPDATE, DELETE
+        return em
+                .createQuery("SELECT COUNT(i) FROM Shot i WHERE i.ownerId = :userId", Long.class)
+                .setParameter("userId", userId)
+                .getSingleResult();
+    }
+
     public List<Shot> createEntityFromDTO(ShotDTO dto) {
         List<Shot> result = new ArrayList<>();
         for(double x : dto.getX()) {
             for(double r : dto.getR()) {
-                result.add(new Shot(x, dto.getY(), r));
+                result.add(new Shot(x, (dto.getY()).doubleValue(), r));
             }
         }
         return result;
