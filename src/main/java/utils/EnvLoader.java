@@ -1,10 +1,6 @@
 package utils;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.ApplicationScoped;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,7 +9,6 @@ import java.util.stream.Stream;
 
 
 public class EnvLoader {
-
     @PostConstruct
     public void init() {
         loadEnv(".env");
