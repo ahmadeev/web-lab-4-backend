@@ -54,6 +54,7 @@ public class AuthController {
             String token = JWT.create()
                     .withSubject(userStored.getName())
                     .withClaim("roles", userStored.getRole().toString())
+                    .withClaim("userId", userStored.getId())
                     .withExpiresAt(new Date(System.currentTimeMillis() + 3_600_000)) // 1 час = 3_600_000, 1 минута = 60_000
                     .sign(Algorithm.HMAC256(SECRET_KEY));
 

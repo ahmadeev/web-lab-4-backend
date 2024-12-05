@@ -1,6 +1,6 @@
 package controllers;
 
-import auth.AuthService;
+import auth.UserPrincipal;
 import dto.ShotDTO;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -27,9 +27,6 @@ public class ShotController {
     @Inject
     private ShotService shotService;
 
-    @Inject
-    private AuthService authService;
-
     @PostConstruct
     private void init() {
         System.out.println("ShotController initialized");
@@ -42,11 +39,7 @@ public class ShotController {
     public Response createUserShot(@Valid ShotDTO shotDTO, @Context SecurityContext securityContext) {
         System.out.println("Trying to create shot");
 
-        String username = securityContext.getUserPrincipal().getName();
-        System.out.println(username);
-
-        long userId = authService.getUserByName(username).getId();
-        System.out.println(userId);
+        long userId = ((UserPrincipal) securityContext.getUserPrincipal()).getUserId();
 
         List<Shot> shot = shotService.createEntityFromDTO(shotDTO);
         shotService.createUserShot(shot, userId);
@@ -98,11 +91,7 @@ public class ShotController {
             @QueryParam("size") @DefaultValue("10") int size,
             @Context SecurityContext securityContext
     ) {
-        String username = securityContext.getUserPrincipal().getName();
-        System.out.println(username);
-
-        long userId = authService.getUserByName(username).getId();
-        System.out.println(userId);
+        long userId = ((UserPrincipal) securityContext.getUserPrincipal()).getUserId();
 
         List<Shot> shots = shotService.getUserShots(page, size, userId);
 
@@ -117,11 +106,7 @@ public class ShotController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateUserShot(@PathParam("id") long id, @Valid ShotDTO shotDTO, @Context SecurityContext securityContext) {
-        String username = securityContext.getUserPrincipal().getName();
-        System.out.println(username);
-
-        long userId = authService.getUserByName(username).getId();
-        System.out.println(userId);
+        long userId = ((UserPrincipal) securityContext.getUserPrincipal()).getUserId();
 
         boolean isUpdated = shotService.updateUserShotById(id, userId, shotDTO);
 
@@ -143,11 +128,7 @@ public class ShotController {
     public Response deleteUserShot(@PathParam("id") long id, @Context SecurityContext securityContext) {
         System.out.println("Trying to delete shot #" + id);
 
-        String username = securityContext.getUserPrincipal().getName();
-        System.out.println(username);
-
-        long userId = authService.getUserByName(username).getId();
-        System.out.println(userId);
+        long userId = ((UserPrincipal) securityContext.getUserPrincipal()).getUserId();
 
         boolean isDeleted = shotService.deleteUserShotById(id, userId);
         if (isDeleted) {
@@ -166,11 +147,7 @@ public class ShotController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteUserShots(@Context SecurityContext securityContext) {
-        String username = securityContext.getUserPrincipal().getName();
-        System.out.println(username);
-
-        long userId = authService.getUserByName(username).getId();
-        System.out.println(userId);
+        long userId = ((UserPrincipal) securityContext.getUserPrincipal()).getUserId();
 
         int rowsDeleted = shotService.deleteUserShots(userId);;
 
@@ -193,10 +170,7 @@ public class ShotController {
     public Response getShotsCount(@Context SecurityContext securityContext) {
         System.out.println("Trying to get shots count");
 
-        String username = securityContext.getUserPrincipal().getName();
-        System.out.println(username);
-        long userId = authService.getUserByName(username).getId();
-        System.out.println(userId);
+        long userId = ((UserPrincipal) securityContext.getUserPrincipal()).getUserId();
 
         long count = shotService.getShotsCount(userId);
         if (count > 0) return Response.ok().entity(
