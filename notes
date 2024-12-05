@@ -21,7 +21,7 @@
     "height": 180
   },
   "age": 25,
-  "description": "A fierce dragon",
+  "description": "A fierce shot",
   "wingspan": 15,
   "character": "CHAOTIC_EVIL",
   "head": {
@@ -32,12 +32,12 @@
 
 
     @POST
-    @Path("/dragon-fixed")
+    @Path("/shot-fixed")
     @Produces(MediaType.APPLICATION_JSON)
     public Response createFixedDragon() {
-        System.out.println("Trying to create dragon");
-        Dragon dragon = new Dragon(
-                "dragon",
+        System.out.println("Trying to create shot");
+        Dragon shot = new Dragon(
+                "shot",
                 new Coordinates((long) 600, (int) 700),
                 java.time.ZonedDateTime.now(),
                 new DragonCave((float) 5),
@@ -60,7 +60,7 @@
                 )
         );
 
-        mainService.createDragon(dragon);
-        System.out.println("Successfully created dragon");
+        mainService.createDragon(shot);
+        System.out.println("Successfully created shot");
         return Response.ok().build();
     }

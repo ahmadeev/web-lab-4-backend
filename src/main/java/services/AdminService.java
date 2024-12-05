@@ -4,15 +4,12 @@ import auth.AdminRequest;
 import auth.Roles;
 import auth.User;
 import auth.UserDTO;
-import dto.DragonDTO;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
-import objects.*;
 
 import java.util.List;
 

@@ -8,8 +8,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DragonHeadDTO {
-    private float eyesCount;
+public class ShotDTO {
     @NotNull
-    private Double toothCount; //Поле не может быть null
+    private double x;
+    @NotNull
+    private double y;
+    @NotNull
+    private double r;
 }

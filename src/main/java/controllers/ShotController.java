@@ -1,7 +1,7 @@
 package controllers;
 
 import auth.AuthService;
-import dto.DragonDTO;
+import dto.ShotDTO;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
@@ -15,61 +15,32 @@ import objects.*;
 import responses.ResponseEntity;
 import responses.ResponseStatus;
 import jakarta.inject.Inject;
-import services.DragonService;
+import services.ShotService;
 
 import java.util.List;
 
-@Named(value = "mainController")
+@Named(value = "shotController")
 @ApplicationScoped
 @Path("/user")
-public class DragonController {
+public class ShotController {
 
     @Inject
-    private DragonService dragonService;
+    private ShotService shotService;
 
     @Inject
     private AuthService authService;
 
     @PostConstruct
     private void init() {
-        System.out.println("DragonController initialized");
-    }
-
-    @GET
-    @Path("/dragon/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getDragon(@PathParam("id") long id) {
-        System.out.println("Trying to get dragon #" + id);
-        Dragon dragon = dragonService.getDragonById(id);
-        if (dragon != null) return Response.ok().entity(
-                new ResponseEntity(ResponseStatus.SUCCESS, "", dragon)
-        ).build();
-        return Response.status(Response.Status.NOT_FOUND).entity(
-                new ResponseEntity(ResponseStatus.ERROR, "Dragon not found", null)
-        ).build();
-    }
-
-    // @QueryParam в случае '/dragons?page=1&size=10, @PathParam для штук типа '/dragon/{id}'
-    @GET
-    @Path("/dragons")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getDragons(@QueryParam("page") @DefaultValue("0") int page,
-                             @QueryParam("size") @DefaultValue("10") int size) {
-        List<Dragon> dragons = dragonService.getDragons(page, size);
-
-        return Response.ok().entity(
-                new ResponseEntity(ResponseStatus.SUCCESS, "", dragons)
-        ).build();
+        System.out.println("ShotController initialized");
     }
 
     @POST
-    @Path("/dragon")
+    @Path("/shot")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createDragon(@Valid DragonDTO dragonDTO, @Context SecurityContext securityContext) {
-        System.out.println("Trying to create dragon");
+    public Response createUserShot(@Valid ShotDTO shotDTO, @Context SecurityContext securityContext) {
+        System.out.println("Trying to create shot");
 
         String username = securityContext.getUserPrincipal().getName();
         System.out.println(username);
@@ -77,28 +48,79 @@ public class DragonController {
         long userId = authService.getUserByName(username).getId();
         System.out.println(userId);
 
-        Dragon dragon = dragonService.createEntityFromDTO(dragonDTO);
-        dragonService.createDragon(dragon, userId);
+        Shot shot = shotService.createEntityFromDTO(shotDTO);
+        shotService.createUserShot(shot, userId);
 
-        System.out.println("Successfully created dragon");
+        System.out.println("Successfully created shot");
         return Response.ok().entity(
-                new ResponseEntity(ResponseStatus.SUCCESS,"Successfully created dragon", null)
+                new ResponseEntity(ResponseStatus.SUCCESS,"Successfully created shot", null)
+        ).build();
+    }
+
+    @GET
+    @Path("/shot/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getShot(@PathParam("id") long id) {
+        System.out.println("Trying to get shot #" + id);
+        Shot shot = shotService.getShotById(id);
+        if (shot != null) return Response.ok().entity(
+                new ResponseEntity(ResponseStatus.SUCCESS, "", shot)
+        ).build();
+        return Response.status(Response.Status.NOT_FOUND).entity(
+                new ResponseEntity(ResponseStatus.ERROR, "Shot not found", null)
+        ).build();
+    }
+
+    // @QueryParam в случае '/shots?page=1&size=10, @PathParam для штук типа '/shot/{id}'
+    @GET
+    @Path("/shots")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getShots(@QueryParam("page") @DefaultValue("0") int page,
+                             @QueryParam("size") @DefaultValue("10") int size) {
+        List<Shot> shots = shotService.getShots(page, size);
+
+        return Response.ok().entity(
+                new ResponseEntity(ResponseStatus.SUCCESS, "", shots)
+        ).build();
+    }
+
+    @GET
+    @Path("/shots")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUserShots(
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("size") @DefaultValue("10") int size,
+            @Context SecurityContext securityContext
+    ) {
+        String username = securityContext.getUserPrincipal().getName();
+        System.out.println(username);
+
+        long userId = authService.getUserByName(username).getId();
+        System.out.println(userId);
+
+        List<Shot> shots = shotService.getUserShots(page, size, userId);
+
+        return Response.ok().entity(
+                new ResponseEntity(ResponseStatus.SUCCESS, "", shots)
         ).build();
     }
 
     // подумать. пока было трудно
     @PUT
-    @Path("/dragon/{id}")
+    @Path("/shot/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateDragon(@PathParam("id") long id, @Valid DragonDTO dragonDTO, @Context SecurityContext securityContext) {
+    public Response updateUserShot(@PathParam("id") long id, @Valid ShotDTO shotDTO, @Context SecurityContext securityContext) {
         String username = securityContext.getUserPrincipal().getName();
         System.out.println(username);
 
         long userId = authService.getUserByName(username).getId();
         System.out.println(userId);
 
-        boolean isUpdated = dragonService.updateDragonById(id, userId, dragonDTO);
+        boolean isUpdated = shotService.updateUserShotById(id, userId, shotDTO);
 
         if (isUpdated) {
             return Response.ok().entity(
@@ -107,16 +129,16 @@ public class DragonController {
         }
 
         return Response.status(Response.Status.NOT_MODIFIED).entity(
-                new ResponseEntity(ResponseStatus.ERROR,"Dragon was not updated", null)
+                new ResponseEntity(ResponseStatus.ERROR,"Shot was not updated", null)
         ).build();
     }
 
     @DELETE
-    @Path("/dragon/{id}")
+    @Path("/shot/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteDragon(@PathParam("id") long id, @Context SecurityContext securityContext) {
-        System.out.println("Trying to delete dragon #" + id);
+    public Response deleteUserShot(@PathParam("id") long id, @Context SecurityContext securityContext) {
+        System.out.println("Trying to delete shot #" + id);
 
         String username = securityContext.getUserPrincipal().getName();
         System.out.println(username);
@@ -124,39 +146,39 @@ public class DragonController {
         long userId = authService.getUserByName(username).getId();
         System.out.println(userId);
 
-        boolean isDeleted = dragonService.deleteDragonById(id, userId);
+        boolean isDeleted = shotService.deleteUserShotById(id, userId);
         if (isDeleted) {
             return Response.noContent().entity(
-                    new ResponseEntity(ResponseStatus.SUCCESS, "Successfully deleted dragon", null)
+                    new ResponseEntity(ResponseStatus.SUCCESS, "Successfully deleted shot", null)
             ).build(); // Статус 204, если удаление успешно
         } else {
             return Response.status(Response.Status.NOT_FOUND).entity(
-                    new ResponseEntity(ResponseStatus.ERROR, "Dragon not found", null)
+                    new ResponseEntity(ResponseStatus.ERROR, "Shot not found", null)
             ).build(); // Статус 404, если дракон не найден
         }
     }
 
     @DELETE
-    @Path("/dragons")
+    @Path("/shots")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteDragons(@Context SecurityContext securityContext) {
+    public Response deleteUserShots(@Context SecurityContext securityContext) {
         String username = securityContext.getUserPrincipal().getName();
         System.out.println(username);
 
         long userId = authService.getUserByName(username).getId();
         System.out.println(userId);
 
-        int rowsDeleted = dragonService.deleteDragons(userId);;
+        int rowsDeleted = shotService.deleteUserShots(userId);;
 
         if (rowsDeleted > 0) {
             //  можно использовать noContent(), но тогда не будет тела ответа
             return Response.ok().entity(
-                    new ResponseEntity(ResponseStatus.SUCCESS, "Successfully deleted %d dragons".formatted(rowsDeleted), null)
+                    new ResponseEntity(ResponseStatus.SUCCESS, "Successfully deleted %d shots".formatted(rowsDeleted), null)
             ).build();
         } else {
             return Response.status(Response.Status.NOT_FOUND).entity(
-                    new ResponseEntity(ResponseStatus.ERROR, "Dragons belong to user not found", null)
+                    new ResponseEntity(ResponseStatus.ERROR, "Shots belong to user not found", null)
             ).build();
         }
     }
