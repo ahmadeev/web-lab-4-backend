@@ -32,14 +32,17 @@ public class ShotService {
     }
 
     @Transactional
-    public void createUserShot(List<Shot> shots, long userId) {
+    public List<Shot> createUserShot(List<Shot> shots, long userId) {
+        List<Shot> result = new ArrayList<>();
         for(Shot shot : shots) {
             long startTime = System.nanoTime();
             shot.setHit(areaCheck.isHit(shot.getX(), shot.getY(), shot.getR()));
             shot.setOwnerId(userId);
             shot.setScriptTime((System.nanoTime() - startTime) / 1000);
+            result.add(shot);
             em.persist(shot);
         }
+        return result;
     }
 
     @Transactional

@@ -42,11 +42,11 @@ public class ShotController {
         long userId = ((UserPrincipal) securityContext.getUserPrincipal()).getUserId();
 
         List<Shot> shot = shotService.createEntityFromDTO(shotDTO);
-        shotService.createUserShot(shot, userId);
+        List<Shot> shots = shotService.createUserShot(shot, userId);
 
         System.out.println("Successfully created shot");
         return Response.ok().entity(
-                new ResponseEntity(ResponseStatus.SUCCESS,"Successfully created shot", null)
+                new ResponseEntity(ResponseStatus.SUCCESS,"Successfully created shot", shots)
         ).build();
     }
 
