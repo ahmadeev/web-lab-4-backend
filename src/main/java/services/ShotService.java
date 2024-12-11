@@ -70,21 +70,13 @@ public class ShotService {
 
     }
 
-    //  пока не готово
     @Transactional
-    public boolean updateUserShotById(long id, long userId, ShotDTO shotDTO) {
-        Shot shot = em.find(Shot.class, id);
-
-        if (shot == null) return false;
-        if (shot.getOwnerId() != userId) return false;
-
-        // Обновление полей
-//        shot.setName(shotDTO.getName());
-//        shot.setAge(shotDTO.getAge());
-//        shot.setWingspan(shotDTO.getWingspan());
-//        shot.setDescription(shotDTO.getDescription());
-
-        return true;
+    public List<Shot> getAllUserShots(long userId) {
+        String jpql = "SELECT i FROM Shot i WHERE i.ownerId = :userId";
+        TypedQuery<Shot> query = em.createQuery(jpql, Shot.class);
+        return query
+                .setParameter("userId", userId)
+                .getResultList();
     }
 
     @Transactional

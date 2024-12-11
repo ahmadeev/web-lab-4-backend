@@ -100,24 +100,20 @@ public class ShotController {
         ).build();
     }
 
-    // подумать. пока было трудно
-    @PUT
-    @Path("/shot/{id}")
+    // было бы круто по всем правилам REST добавить имя пользователя в строку запроса
+    @GET
+    @Path("/all-shots")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateUserShot(@PathParam("id") long id, @Valid ShotDTO shotDTO, @Context SecurityContext securityContext) {
+    public Response getAllUserShots(
+            @Context SecurityContext securityContext
+    ) {
         long userId = ((UserPrincipal) securityContext.getUserPrincipal()).getUserId();
 
-        boolean isUpdated = shotService.updateUserShotById(id, userId, shotDTO);
+        List<Shot> shots = shotService.getAllUserShots(userId);
 
-        if (isUpdated) {
-            return Response.ok().entity(
-                    new ResponseEntity(ResponseStatus.SUCCESS,"Successfully updated dragon", null)
-            ).build();
-        }
-
-        return Response.status(Response.Status.NOT_MODIFIED).entity(
-                new ResponseEntity(ResponseStatus.ERROR,"Shot was not updated", null)
+        return Response.ok().entity(
+                new ResponseEntity(ResponseStatus.SUCCESS, "", shots)
         ).build();
     }
 
