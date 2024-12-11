@@ -18,11 +18,11 @@ public class AreaCheck {
         }
         //Top-left
         if (x <= 0 && y >= 0) {
-            return x / 2 + r / 2 >= y;
+            return (y <= r) && (x >= (-r) / 2);
         }
         //Bottom-left
         if (x <= 0 && y <= 0) {
-            return (y >= (-r)) && (x >= (-r) / 2);
+            return (y >= -x - r / 2);
         }
         //Bottom-right
         return false;
