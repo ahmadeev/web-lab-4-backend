@@ -145,7 +145,7 @@ public class ShotController {
     public Response deleteUserShots(@Context SecurityContext securityContext) {
         long userId = ((UserPrincipal) securityContext.getUserPrincipal()).getUserId();
 
-        int rowsDeleted = shotService.deleteUserShots(userId);;
+        long rowsDeleted = shotService.deleteUserShots(userId);;
 
         if (rowsDeleted > 0) {
             //  можно использовать noContent(), но тогда не будет тела ответа

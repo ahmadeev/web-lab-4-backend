@@ -9,11 +9,13 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
+import lombok.Getter;
 import objects.*;
 import jakarta.persistence.Query;
 import utils.AreaCheck;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Named(value = "shotService")
@@ -25,6 +27,9 @@ public class ShotService {
 
     @Inject
     private AreaCheck areaCheck;
+
+    @Getter
+    private final HashMap<Long, Long> userShotsCountStore = new HashMap<>();
 
     @PostConstruct
     private void init() {
@@ -41,6 +46,11 @@ public class ShotService {
             shot.setScriptTime((System.nanoTime() - startTime) / 1000);
             result.add(shot);
             em.persist(shot);
+        }
+        if (userShotsCountStore.containsKey(userId)) {
+            userShotsCountStore.put(userId, userShotsCountStore.get(userId) + result.size());
+        } else {
+            userShotsCountStore.put(userId, (long) result.size());
         }
         return result;
     }
@@ -67,7 +77,6 @@ public class ShotService {
                 .setFirstResult(page * size)
                 .setMaxResults(size)
                 .getResultList();
-
     }
 
     @Transactional
@@ -91,20 +100,35 @@ public class ShotService {
     }
 
     @Transactional
-    public int deleteUserShots(long userId) {
+    public long deleteUserShots(long userId) {
         String jpql = "DELETE FROM Shot o WHERE o.ownerId = :userId";
         Query query = em.createQuery(jpql);
         query.setParameter("userId", userId);
-        return query.executeUpdate();
+
+        long count = query.executeUpdate();
+        userShotsCountStore.remove(userId);
+
+        return count;
     }
 
     @Transactional
     public long getShotsCount(long userId) {
         // .executeUpdate() для INSERT, UPDATE, DELETE
-        return em
+
+        if (userShotsCountStore.containsKey(userId)) {
+            System.out.printf("Avoided redundant database query. %d rows stored.\n", userShotsCountStore.get(userId));
+            return userShotsCountStore.get(userId);
+        }
+
+        long count = em
                 .createQuery("SELECT COUNT(i) FROM Shot i WHERE i.ownerId = :userId", Long.class)
                 .setParameter("userId", userId)
                 .getSingleResult();
+
+        userShotsCountStore.put(userId, count);
+        System.out.printf("Executed database query and saved number of rows (stored %d rows)\n", count);
+
+        return count;
     }
 
     public List<Shot> createEntityFromDTO(ShotDTO dto) {
